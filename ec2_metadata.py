@@ -36,7 +36,6 @@ class EC2Metadata(BaseLazyObject):
             session = requests.Session()
         self._session = session
         self._token_updated_at = 0
-        self._ensure_fresh_token()
 
     def _ensure_fresh_token(self):
         """ Update the metadata token if needed.
@@ -50,6 +49,7 @@ class EC2Metadata(BaseLazyObject):
             self._token_updated_at = now
 
     def _get_url(self, url, allow_404=False):
+        self._ensure_fresh_token()
         resp = self._session.get(url, timeout=1.0)
         if resp.status_code != 404 or not allow_404:
             resp.raise_for_status()
